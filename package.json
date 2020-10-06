@@ -1,0 +1,14 @@
+{
+  "name": "submitchat-express",
+  "version": "1.0.0",
+  "description": "submit chat using basics of Express",
+  "main": "submitChat-express.js",
+  "scripts": {
+    "test": "Wow 1-2-3"
+  },
+  "author": "MB 812",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
