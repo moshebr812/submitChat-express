@@ -19,7 +19,7 @@
            <div id="divLeftSectionContainer">
 
                 <div id="divChatHistoryMainContainer">
-                   <h4>Message History - ###CountMessages### logged</h4>     
+                   <h4 id="headerMessgaHistory">Message History - ###CountMessages### logged</h4>     
                    <div id="messageHistoryList">
                         <!-- this text will be replaced by a set of divs, one div for each message "History" -->
                         ###MessageHistory###
@@ -60,9 +60,7 @@
                 </div>
             </div>   <!--   END divLeftSectionContainer -->
             
-            
-
-            <div id="divRightSectionContainer">
+             <div id="divRightSectionContainer">
                 <h4>Submit Chat, Show Chat History, Delete History, usinh "express"</h4>
                 <ol>  
                     <li>node-module "express</li>
@@ -72,7 +70,6 @@
                 </ol>
             </div>
         </div>
-
  
         <div id="divFooter">
             <h4>Footer</h4>    
@@ -85,6 +82,8 @@
         const btnClearHist = document.querySelector('#clearHistory');
         const defaultURL = 'http://localhost:4040/';
         const monthNameFormat = 'SHORT';
+        // headerMessgaHistory
+        const headerMessgaHistory = document.querySelector('#headerMessgaHistory');
         const histDivContainer = document.querySelector('#messageHistoryList');
 
         formChatDetails.addEventListener ('submit', (event) => {
@@ -108,7 +107,8 @@
             const response = await fetch (`${defaultURL}write-chat?nickName=${nickName}&message=${message}&id=${idByDate}&insertTime=${insertTime}`);
             // the response includes the new Array
             let newChatArray = await response.json();
-            console.log ( JSON.stringify(newChatArray) );
+            
+            // console.log ( JSON.stringify(newChatArray) );
 
             loadHistoryToDOM (newChatArray);
         } // END submitNewMessage
@@ -129,6 +129,8 @@
                 // 1. After new submit
                 // 2. after 1st load
                 // 3. After clear (maybe)
+            
+            // The actual list
             let msgHistoryContent = '';
             
             if (histArray.length) {
@@ -138,12 +140,28 @@
                         <strong class="oneMessageStrong">${element.nickName} [${element.id}]:</strong>
                         <label class="oneMessageTime">At: ${element.insertTime}  </label>
                         ${element.message}
+                        <button class="oneMessageDelButton" id="idDelOneMessage_${element.id}" 
+                            onclick=delChatByID("${element.id}")>Delete</button>    
                     </div>`
+
+                    // <button onclick="myFunction()">Click me</button>
                 });
             } // end if on (histArray.length)
-
+            // Update main Div with the correct Chat Hist List
             histDivContainer.innerHTML = msgHistoryContent;
+
+            // Update list header which includes the counter
+            let msg = 'Message History - non logged';
+            if (histArray.length) {
+                // i.e. valid and we have content
+                msg = 'Message History - ' + histArray.length + ' messages logged';
+            } 
+            headerMessgaHistory.innerHTML = msg;
         } // END loadHistoryToDOM
+
+        function delChatByID (buttonID) {
+            console.log (`delChatByID() - delete chatID [${buttonID}]`)
+        }
 
         async function getHistoryList() {
             // DO NOT HOLD a global Array of the chat on the DOM. the data is managed by teh Server Side
@@ -189,9 +207,5 @@
         // 1st load
         getHistoryList();
     </script>
-
-
-
-
 </body>
 </html>

@@ -14,20 +14,20 @@ const fullDebug = false;
 //
 let reqCounter = 0;
 
-// console.clear();
+console.clear();
 console.log (`STARTING     <<submitChat-express.js>>     RUNNING on posrt ${myPort}`);
 fullDebug? console.log (`json file at start: ${JSON.stringify(chatHistArray)}` ) : 0;
 
-// maybe open this for Debug Logger
-// myApp.use ( (req, res, next) => {
-//     console.log ('\nMiddleware myApp.use () for all calls ');
-//     next();
-// });
+
+myApp.use ((req, res, next) =>{
+    console.log (`\n\n_______Middleware______ myApp.use(). reqCounter = ${reqCounter}`);
+    // if I don't sepcify the next, the code will stop and no function will be exceuted thereafter
+    next();
+});
 
 
 // Load the CSS directly after u located it in /public
 myApp.use ( expressSrv.static(pathSrv.join ( __dirname , '/public/') ) );
-
 
 // just loading the html once upon refresh
 // the population of all other objects / chat hist is from js FILE after DOM Body completed loading
@@ -48,8 +48,10 @@ myApp.get('/read-chat-hist' , (request, response) => {
 myApp.get ('/write-chat' , (request, response) => {
     // request.url = is before parsing --> debug the input
     console.log (`get('/write-chat') request.url \n.... ${request.url}`);
+
     // request.parse = get the parameters in a Tidy JSON element {} 
-    console.log (`JSON.stringify (request.query) \n ...${JSON.stringify(request.query)} `);
+    // console.log (`JSON.stringify (request.query) \n ...${JSON.stringify(request.query)} `);
+    
     // So now I can add the new submit to my "global array"
     chatHistArray.push (request.query);
     // And now commit the new array back to the file. Remeber to convert to JSON syntax fisrt

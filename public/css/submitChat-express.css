@@ -62,8 +62,8 @@ h4 {
 .oneMessageDiv {
     position: relative;
     border:2px dashed darkgreen;
-    /* background-color: greenyellow; */
-    background-color: skyblue;
+    background-color: greenyellow;
+    /* background-color: skyblue; */
     color: black;
     margin: 5px 10px 0px 10px; 
     width: 90%;
@@ -74,6 +74,17 @@ h4 {
  }
 .oneMessageStrong {
     padding: 5px;
+}
+
+.oneMessageDelButton {
+    color: red;
+    width: 45px;
+    height: 20px;
+    font-size: x-small;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border-radius: 10px;
 }
 
 #divSubmitChat {
@@ -88,6 +99,6 @@ h4 {
 .oneMessageTime {
     position: absolute;
     top: 8px;
-    right: 50px;
+    right: 60px;
     font-size: 13px;
 }
