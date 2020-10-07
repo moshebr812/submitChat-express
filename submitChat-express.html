@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Form & Hist </title>
+    <link rel="stylesheet" type="text/css" href="/css/submitChat-express.css">
+</head>
+<body>
+    <div id="divMaincontainer">
+        <div id="divHeader">
+            <h4>form to submit chat + history of chat </h4>
+            <h4>using node express (without REST API)</h4>
+        </div>
+
+        <div id="divBody">
+           
+
+           <div id="divLeftSectionContainer">
+
+                <div id="divChatHistoryMainContainer">
+                   <h4>Message History - ###CountMessages### logged</h4>     
+                   <div id="messageHistoryList">
+                        <!-- this text will be replaced by a set of divs, one div for each message "History" -->
+                        ###MessageHistory###
+                        <!-- <div class="oneMessageDiv">AAA</div> --> 
+                    </div>    <!-- END messageHistoryList -->
+                </div>  <!-- END divChatHistoryMainContainer-->
+                
+                <div id="divSubmitChat">
+                    <h4>New Chat<h4>
+                        <form action="/" method="GET" id="formChatSubmit">
+                           <label>Name:
+                               <select name="nickName" aria-placeholder="....select">
+                                   <option value=""></option>
+                                   <option value="nlStaruss">nlStaruss</option>
+                                   <option value="eDayan">eHobbit</option>
+                                   <option value="aMenachem">aMenachem</option>
+                                   <option value="zLevi">zLevi</option>
+                                   <option value="dGal">dGal</option>
+                               </select>
+                           </label>
+                           <label>Message:
+                               <input type="text" name="message" style="width: 200px;">
+                           </label><br>
+                           <input type="submit" id="submitChat">
+                           <button name="delMessage" id="clearHistory">DelHistory</button>
+                       </form>
+                </div>
+
+                <div id="divChatUsers">
+                    <h4>Members List</h4>
+                    <ol>
+                        <li>Niv Levi Staruss, Tel Aviv, nlStaruss</li>
+                        <li>Elena Hobbit, Tel Aviv, eHobbit</li>
+                        <li>Amir Menchem. Jerusalem, aMenachem</li>
+                        <li>Ziv Levi, Jerusalem, zLevi</li>
+                        <li>Duby Gal, Tel Aviv, dGal</li>
+                    </ol>
+                </div>
+            </div>   <!--   END divLeftSectionContainer -->
+            
+            
+
+            <div id="divRightSectionContainer">
+                <h4>Submit Chat, Show Chat History, Delete History, usinh "express"</h4>
+                <ol>  
+                    <li>node-module "express</li>
+                    <li>if file message-history.json does not exist: create it with []</li>
+                    <li>prevent each message div to extend to full container height-> <strong>height: fit-content</strong></li>
+                    <li>NOTE addEventListener 'submit' is on the form #id, not no input type='submit'</li>
+                </ol>
+            </div>
+        </div>
+
+ 
+        <div id="divFooter">
+            <h4>Footer</h4>    
+        </div>
+    </div>
+    
+    <script>
+        console.log ('DOM Loaded, Script Started');
+        const formChatDetails = document.querySelector('#formChatSubmit');
+        const btnClearHist = document.querySelector('#clearHistory');
+        const defaultURL = 'http://localhost:4040/';
+        const monthNameFormat = 'SHORT';
+        const histDivContainer = document.querySelector('#messageHistoryList');
+
+        formChatDetails.addEventListener ('submit', (event) => {
+            event.preventDefault();
+            submitNewMessage (  formChatDetails.nickName.value,
+                                formChatDetails.message.value );
+        });
+
+        btnClearHist.addEventListener ('click' , (event) => {
+            event.preventDefault();
+            clearHistory();
+        });
+
+        async function submitNewMessage(nickName, message) {
+            // generate an ID based on time
+            const idByDate = Date.now().toString().substring(6); // I take only part of the id so it looks better on the DON
+            const insertTime = getTime();
+            console.log (`withing submitNewMessage() Parameters: ${nickName} ${message} ${idByDate} ${insertTime}`);
+            
+            // call the API that will receieve the new info, add to an array, insert to file, return new UPDATE array
+            const response = await fetch (`${defaultURL}write-chat?nickName=${nickName}&message=${message}&id=${idByDate}&insertTime=${insertTime}`);
+            // the response includes the new Array
+            let newChatArray = await response.json();
+            console.log ( JSON.stringify(newChatArray) );
+
+            loadHistoryToDOM (newChatArray);
+        } // END submitNewMessage
+
+        async function clearHistory() {
+            // console.log (`withing clearHistory()`);
+            const response = await fetch (`${defaultURL}del-chat-history`);
+            // the response includes the new Array
+            let newChatArray = await response.json();
+            // console.log ( JSON.stringify(newChatArray) );
+
+            // refresh the History List by sending the empty array
+            loadHistoryToDOM (newChatArray);
+        } // END clearHistory
+
+        function loadHistoryToDOM(histArray) {
+            // this function is called when ever the chatHistArray is changing:
+                // 1. After new submit
+                // 2. after 1st load
+                // 3. After clear (maybe)
+            let msgHistoryContent = '';
+            
+            if (histArray.length) {
+                histArray.forEach( (element, idx) => {
+                    msgHistoryContent += 
+                    `<div class="oneMessageDiv"> 
+                        <strong class="oneMessageStrong">${element.nickName} [${element.id}]:</strong>
+                        <label class="oneMessageTime">At: ${element.insertTime}  </label>
+                        ${element.message}
+                    </div>`
+                });
+            } // end if on (histArray.length)
+
+            histDivContainer.innerHTML = msgHistoryContent;
+        } // END loadHistoryToDOM
+
+        async function getHistoryList() {
+            // DO NOT HOLD a global Array of the chat on the DOM. the data is managed by teh Server Side
+            const response = await fetch (`${defaultURL}read-chat-hist`);
+            const chatArray = await response.json();
+            loadHistoryToDOM ( chatArray );
+        }
+        //==========    getTime    ===================
+        function getTime() {
+            let time = new Date();
+            let timeInUIFormat = 
+                dateZeroPrefix (time.getDate().toString(), 2) + '-' +
+                getMonthName (time.getMonth(), monthNameFormat) + '-' + time.getFullYear() + '  ' +
+                dateZeroPrefix ( time.getHours().toString(), 2 ) + ":" + 
+                dateZeroPrefix ( time.getMinutes().toString(), 2)  + ":" + 
+                dateZeroPrefix ( time.getSeconds().toString(), 2 );
+        
+            return timeInUIFormat;
+        } // END getTime()
+
+
+        //==========    getMonthName    ===================
+        function getMonthName (pMonthEnum, pFormat) {
+            monthShortNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            monthLongNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            if (pFormat==='LONG') {
+                return (monthLongNames[pMonthEnum]);    
+            } else {
+                return (monthShortNames[pMonthEnum]);
+            }
+        } // END getMonthName
+
+        //==========    dateZeroPrefix    ===================
+        function dateZeroPrefix (pOrgString, pRequiredLength) {
+            let prefix = '0';
+            // console.log(pOrgString + '--'+ pRequiredLength);
+            while (pOrgString.length < parseInt(pRequiredLength)) {
+                pOrgString = prefix + pOrgString;
+            }
+            return pOrgString;
+        } // END dateZeroPrefix
+
+        // 1st load
+        getHistoryList();
+    </script>
+
+
+
+
+</body>
+</html>
