@@ -111,6 +111,10 @@
             // console.log ( JSON.stringify(newChatArray) );
 
             loadHistoryToDOM (newChatArray);
+
+            // if we reached here we assume Submit succeeded ==>> clean input fields on ON 
+            formChatDetails.nickName.value = '';
+            formChatDetails.message.value = '';
         } // END submitNewMessage
 
         async function clearHistory() {
