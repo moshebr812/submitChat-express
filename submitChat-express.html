@@ -80,7 +80,7 @@
         console.log ('DOM Loaded, Script Started');
         const formChatDetails = document.querySelector('#formChatSubmit');
         const btnClearHist = document.querySelector('#clearHistory');
-        const defaultURL = 'http://localhost:4040/';
+        const defaultURL = 'http://localhost:8080/';
         const monthNameFormat = 'SHORT';
         // headerMessgaHistory
         const headerMessgaHistory = document.querySelector('#headerMessgaHistory');
@@ -99,7 +99,7 @@
 
         async function submitNewMessage(nickName, message) {
             // generate an ID based on time
-            const idByDate = Date.now().toString().substring(6); // I take only part of the id so it looks better on the DON
+            const idByDate = Date.now().toString().substring(3); // I take only part of the id so it looks better on the DON
             const insertTime = getTime();
             console.log (`withing submitNewMessage() Parameters: ${nickName} ${message} ${idByDate} ${insertTime}`);
             
@@ -159,8 +159,14 @@
             headerMessgaHistory.innerHTML = msg;
         } // END loadHistoryToDOM
 
-        function delChatByID (buttonID) {
+        async function delChatByID (buttonID) {
             console.log (`delChatByID() - delete chatID [${buttonID}]`)
+            // fetch (`${defaultURL}write-chat?nickName=${nickName}&message=${message}&id=${idByDate}&insertTime=${insertTime}`);
+            const response = await fetch (`${defaultURL}del-single-chat?id=${buttonID}`)
+            const arrayAfterDelete = await response.json();
+
+            //load it back to DOM
+            loadHistoryToDOM ( arrayAfterDelete);
         }
 
         async function getHistoryList() {
