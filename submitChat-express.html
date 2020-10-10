@@ -165,8 +165,13 @@
 
         async function delChatByID (buttonID) {
             console.log (`delChatByID() - delete chatID [${buttonID}]`)
-            // fetch (`${defaultURL}write-chat?nickName=${nickName}&message=${message}&id=${idByDate}&insertTime=${insertTime}`);
-            const response = await fetch (`${defaultURL}del-single-chat?id=${buttonID}`)
+            
+            // this syntax is read in the API via request.query['id']
+            // const response = await fetch (`${defaultURL}del-single-chat?id=${buttonID}`);
+
+            // this syntax is read in the API via request.parameters.id
+            const response = await fetch (`${defaultURL}del-single-chat/${buttonID}`);
+
             const arrayAfterDelete = await response.json();
 
             //load it back to DOM

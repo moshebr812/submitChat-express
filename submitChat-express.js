@@ -64,21 +64,29 @@ myApp.get ('/write-chat' , (request, response) => {
     response.send (chatHistArray);
 });
 
-myApp.get('/del-single-chat' , (req, response) =>  {
-    const idToDel = req.query['id'];
 
+// myApp.get('/del-single-chat' , (req, response) =>  {
+    // let idToDel = req.query['id'];
+    // console.log ('del-single-chat req.query.id : ' + req.query.id );
+
+myApp.get('/del-single-chat/:id' , (req, response) =>  {
+    let idToDel = req.params.id;
+    console.log ('del-single-chat req.params.id : ' + req.params.id);
+    
     if (fullDebug) {
         console.log ('del-single-chat req.url : ' + req.url);
         console.log ('del-single-chat req.query : ' + req.query );
         console.log ('del-single-chat req.query.id : ' + req.query.id );
         console.log ('del-single-chat JSON.stringify : ' + JSON.stringify ( req.query ) );
-    }    
-    
-    console.log ('DELETE: \ndel-single-chat req.query["id"] : ' +  req.query['id']  );
+        console.log ('del-single-chat req.params.id : ' + req.params.id);
+        console.log ('DELETE: \ndel-single-chat req.query["id"] : ' +  req.query['id']  );
+    }  
+
+    // NOTE THE DIFF:
+        // When passing the parameter in the url sytnax - URL/del-single-chat?id=999 , I need to access the id via req.query['id']  
+        // When passing URL/del-single-chat/999 , I need to access the id via req.parameters.id
     
     // 1. find the INDEX of this chat in the Array
-        //      const fruits = ["apple", "banana", "cantaloupe", "blueberries", "grapefruit"];
-        //      const index = fruits.findIndex(fruit => fruit === "blueberries");
     let location = chatHistArray.findIndex ( element => element.id === idToDel);
     if (location<0) {
         // NO changes
